@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Hyppo · Demo Braze</title>
+  <link rel="icon" href="assets/isotipo.png">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&display=swap">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <header class="top">
+    <img src="assets/isotipo.png" alt="Hyppo" class="logo">
+    <div>
+      <p class="caps">Hyppo · Demo interna</p>
+      <h1>Braze Web SDK</h1>
+    </div>
+    <div id="status" class="status">Sin configurar</div>
+  </header>
+
+  <!-- Placement de banner "hero": arriba de todo, como un anuncio de home -->
+  <section class="banner-slot" data-placement="hero">
+    <p class="fallback">Placement <code data-placement-id="hero"></code>: sin banner para este usuario.</p>
+  </section>
+
+  <main>
+    <section class="card" id="identidad">
+      <p class="caps">01 · Identidad</p>
+      <h2>Identificar al usuario</h2>
+      <form id="form-user">
+        <label>External ID <input name="external_id" required placeholder="demo-tomas-1"></label>
+        <label>Email <input name="email" type="email" placeholder="nombre@hyppo.io"></label>
+        <label>Nombre <input name="first_name" placeholder="Tomás"></label>
+        <label>Plan (atributo custom)
+          <select name="plan"><option>free</option><option>pro</option><option>enterprise</option></select>
+        </label>
+        <div class="row">
+          <button type="submit">Identificar</button>
+          <button type="button" id="btn-logout" class="ghost">Cerrar sesión (wipeData)</button>
+        </div>
+      </form>
+      <p class="muted">Usuario actual: <code id="current-user">anónimo</code> · Device ID: <code id="device-id">—</code></p>
+      <details>
+        <summary>Particularidades</summary>
+        <ul>
+          <li><code>changeUser</code> no tiene vuelta atrás: un navegador identificado no vuelve a ser anónimo. Para "desloguear" se usa <code>wipeData()</code>, que borra todo lo local y genera un device nuevo.</li>
+          <li>Lo que hizo el usuario mientras era anónimo se fusiona con el perfil identificado si ese external ID todavía no existía.</li>
+          <li>Para encontrarlo en el dashboard: Audience → Search Users, por external ID o email.</li>
+          <li>Esta demo no usa SDK Authentication (Settings → App Settings), porque necesita un backend que firme un JWT por usuario y esto es un sitio estático. En un cliente real conviene activarla: el backend firma en el login, la web llama a <code>changeUser(id, jwt)</code>, y se prueba primero en "Optional" antes de pasar a "Required".</li>
+        </ul>
+      </details>
+    </section>
+
+    <section class="card" id="eventos">
+      <p class="caps">02 · Eventos</p>
+      <h2>Custom events</h2>
+      <form id="form-event" class="row">
+        <input name="name" value="demo_boton_clickeado" required>
+        <button type="submit">Enviar evento</button>
+      </form>
+      <details>
+        <summary>Particularidades</summary>
+        <ul>
+          <li>El SDK manda los datos en tandas cada pocos segundos. Esta demo llama a <code>requestImmediateDataFlush()</code> después de cada acción para que aparezcan antes.</li>
+          <li>Un evento nuevo aparece en Data Settings → Custom Events recién cuando llega el primero. Hasta entonces no se puede elegir como trigger de una campaña.</li>
+          <li>Las propiedades del evento se usan en Liquid como <code>{{event_properties.${nombre}}}</code> dentro de una campaña disparada por ese evento.</li>
+        </ul>
+      </details>
+    </section>
+
+    <section class="card wide" id="tienda">
+      <p class="caps">03 · Tienda</p>
+      <h2>Carrito y compras</h2>
+      <div class="banner-slot inline" data-placement="tienda">
+        <p class="fallback">Placement <code data-placement-id="tienda"></code>: sin banner para este usuario.</p>
+      </div>
+      <div class="products" id="products"></div>
+      <details>
+        <summary>Particularidades</summary>
+        <ul>
+          <li><code>logPurchase</code> no es un custom event: va a Revenue y a Data Settings → Products, y se filtra con "Purchased product" en los segmentos.</li>
+          <li>"Agregar al carrito" sí es un custom event (<code>agrego_al_carrito</code>) con el producto y el precio como propiedades.</li>
+        </ul>
+      </details>
+    </section>
+
+    <section class="card" id="inapp">
+      <p class="caps">04 · In-app messages</p>
+      <h2>Disparar un in-app</h2>
+      <button id="btn-inapp">Disparar <code>demo_inapp</code></button>
+      <details>
+        <summary>Particularidades</summary>
+        <ul>
+          <li>Crear una campaña In-App Message action-based con trigger "Perform custom event: demo_inapp".</li>
+          <li>El SDK baja los triggers al iniciar la sesión. Una campaña recién lanzada no aparece hasta la sesión siguiente: cerrar sesión con el botón de arriba y volver a identificarse.</li>
+          <li>Los mensajes HTML custom requieren <code>allowUserSuppliedJavascript: true</code>, que esta demo ya tiene.</li>
+        </ul>
+      </details>
+    </section>
+
+    <section class="card" id="banners">
+      <p class="caps">05 · Banners</p>
+      <h2>Banners por placement</h2>
+      <p class="muted">Placements de esta página: <code data-placement-id="hero"></code> (arriba) y <code data-placement-id="tienda"></code> (en la tienda).</p>
+      <button id="btn-banners">Pedir banners de nuevo</button>
+      <details>
+        <summary>Particularidades</summary>
+        <ul>
+          <li>Los placements se crean antes en Settings → Banner Placements, con el mismo ID que usa el código. Después se arma una campaña de Banner por placement.</li>
+          <li>Banners depende del paquete contratado: si el workspace no lo tiene, el SDK devuelve <code>FEATURE_DISABLED</code> (lo muestra el log).</li>
+          <li>Se refrescan al iniciar sesión y al llamar <code>changeUser</code>. A mano, <code>requestBannersRefresh</code> tiene un límite: 5 pedidos por sesión, y se recupera uno cada 3 minutos.</li>
+          <li>Si el usuario no califica para ningún banner, el placement vuelve vacío y se muestra el contenido de fallback.</li>
+          <li>Requieren <code>allowUserSuppliedJavascript: true</code> en el <code>initialize</code>.</li>
+        </ul>
+      </details>
+    </section>
+
+    <section class="card" id="cards">
+      <p class="caps">06 · Content Cards</p>
+      <h2>Feed de Content Cards</h2>
+      <button id="btn-cards">Actualizar feed</button>
+      <div id="cards-feed" class="feed"></div>
+      <details>
+        <summary>Particularidades</summary>
+        <ul>
+          <li>A diferencia del in-app, las cards quedan en el feed hasta que el usuario las descarta o vencen.</li>
+          <li><code>showContentCards</code> dibuja el feed con el estilo de Braze dentro del contenedor que se le pasa.</li>
+        </ul>
+      </details>
+    </section>
+  </main>
+
+  <aside class="log">
+    <div class="log-head"><span class="caps">Log del SDK</span><button id="btn-clear" class="ghost small">Limpiar</button></div>
+    <ol id="log"></ol>
+  </aside>
+
+  <script src="https://js.appboycdn.com/web-sdk/7.1/braze.min.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
