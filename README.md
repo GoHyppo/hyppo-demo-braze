@@ -31,7 +31,7 @@ Pasar a otra versión es un cambio a mano.
 3. **Campañas de la demo** (creadas en el sandbox y activas desde el 2026-11-17):
    - `[Demo] In-app de prueba`: in-app con trigger `demo_inapp`.
    - `[Demo] Oferta por plan`: in-app con trigger `demo_boton_clickeado`, texto según el atributo `plan`.
-   - Canvas `[Demo] Carrito abandonado`: entra con `agrego_al_carrito`, espera 2 minutos, email + in-app.
+   - Canvas `[Demo] Carrito abandonado v2`: entra con `agrego_al_carrito`, espera 2 minutos, in-app y división por el `plan` del evento: free recibe un email con oferta a Pro; el resto, un test A/B de asunto. Conversión y salida: el custom event `compro`. (El primer Canvas, sin ramas, quedó detenido.)
    - Sus IDs van en `js/config.js` (`campaigns`, `canvases`) para los links "Ver en Braze".
    - Pendiente: Banners y Content Cards, cuando el sandbox los tenga.
 

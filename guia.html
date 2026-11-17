@@ -27,7 +27,7 @@
       <ul>
         <li>Abrir la demo con el bloqueador de anuncios apagado (Brave Shields, uBlock). Si está prendido, la página lo avisa.</li>
         <li>Tener Braze abierto en otra pestaña, en el workspace <strong>HYPPO</strong>.</li>
-        <li>Revisar que estén activas las campañas <strong>[Demo] In-app de prueba</strong> y <strong>[Demo] Oferta por plan</strong>, y el Canvas <strong>[Demo] Carrito abandonado</strong> (los links están en cada sección de la demo).</li>
+        <li>Revisar que estén activas las campañas <strong>[Demo] In-app de prueba</strong> y <strong>[Demo] Oferta por plan</strong>, y el Canvas <strong>[Demo] Carrito abandonado v2</strong> (los links están en cada sección de la demo).</li>
         <li>Sumar tu usuario como <em>test user</em> (botón "Add As Test User" en su perfil) a un Internal Group con "Record User Events" tildado, para mostrar el Event User Log con el JSON crudo.</li>
         <li>Practicar una vez antes: los in-app de una campaña recién lanzada aparecen recién en la sesión siguiente.</li>
       </ul>
@@ -66,13 +66,13 @@
     <section class="step">
       <p class="caps">Carrito abandonado</p>
       <h2>La orquestación: el momento fuerte de la demo</h2>
-      <p>En la tienda, agregar un producto al carrito y no comprar. El usuario entra en el Canvas <strong>[Demo] Carrito abandonado</strong>: a los 2 minutos (en producción sería una hora) recibe un email con el producto y el precio, y un in-app que aparece en la sesión siguiente.</p>
+      <p>En la tienda, agregar un producto al carrito y no comprar. El usuario entra en el Canvas <strong>[Demo] Carrito abandonado v2</strong>: a los 2 minutos (en producción sería una hora) recibe un email con el producto y el precio, y un in-app que aparece en la sesión siguiente.</p>
       <img src="assets/guia/demo-tienda.png" alt="Tienda de la demo">
       <p>Mientras tanto, abrir el Canvas en Braze y recorrer el flujo: entrada por evento, espera, un in-app y después una división por plan. Un usuario free recibe un email que además le ofrece pasar a Pro; uno pro o enterprise entra en un test A/B de asunto (Experiment Path 50/50).</p>
       <p>Para que el cliente lo vea en vivo: repetir el carrito con otro plan y otro email (por ejemplo <code>nombre+free@empresa.com</code> y <code>nombre+pro@empresa.com</code>, que llegan a la misma casilla como dos perfiles distintos) y comparar los dos emails. Con una persona por demo el test A/B no llega a ser significativo: lo que se muestra es cómo se arma y las métricas por variante.</p>
       <p class="tip">El plan viaja como propiedad del evento <code>agrego_al_carrito</code> y el Canvas se divide por esa propiedad, no por el atributo del perfil: si el usuario se acaba de identificar, Braze puede no haber procesado todavía el atributo.</p>
       <p>Cuando llegue el email ("Tu carrito te espera"), abrirlo y tocar <strong>Volver a tu carrito</strong>: la demo reconoce al usuario y destaca el producto. Comprarlo cierra el círculo: en el Canvas se ven el email enviado y el clic, y la compra queda en el perfil del usuario y en Revenue.</p>
-      <p class="tip">Si se compra antes de que pasen los 2 minutos, el usuario debería salir del Canvas. Esa salida todavía no está configurada (ver "Pendientes").</p>
+      <p class="tip">Si se compra antes de que pasen los 2 minutos, el usuario sale del Canvas y no recibe el email: la salida y la conversión son el evento <code>compro</code>.</p>
     </section>
 
     <section class="step">
@@ -97,7 +97,6 @@
       <h2>Lo que todavía no se puede mostrar</h2>
       <ul>
         <li><strong>Banners</strong> y <strong>Content Cards</strong> no están habilitados en el sandbox de partner. Ya se pidieron a Braze.</li>
-        <li>El Canvas de carrito abandonado no tiene salida por compra configurada.</li>
       </ul>
     </section>
   </article>

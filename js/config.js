@@ -20,6 +20,6 @@ window.BRAZE_CONFIG = {
     ofertaPorPlan: "6afc7f19a02914008ea56367", // [Demo] Oferta por plan
   },
   canvases: {
-    carritoAbandonado: "6afc806253eb3a008c3be1f1", // [Demo] Carrito abandonado
+    carritoAbandonado: "6afc9660b31a20008e70dcf8", // [Demo] Carrito abandonado v2
   },
 };
