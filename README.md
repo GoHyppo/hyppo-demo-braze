@@ -53,6 +53,6 @@ necesita un origen http(s).
 | Identificar | `changeUser`, `setEmail`, `setFirstName`, `setCustomUserAttribute("plan")` | Audience → Search Users |
 | Cerrar sesión | `wipeData()` | Device nuevo, usuario anónimo |
 | Enviar evento | `logCustomEvent(nombre, props)` | Perfil del usuario, Data Settings → Custom Events |
-| Al carrito | `logCustomEvent("agrego_al_carrito", {producto, precio, plan})` | Ídem |
+| Al carrito | `logCustomEvent("agrego_al_carrito", {producto, nombre, precio, plan})` | Ídem |
 | Comprar | `logPurchase(id, precio, "USD", 1)` | Revenue, Data Settings → Products |
 | Disparar in-app | `logCustomEvent("demo_inapp")` | El mensaje en la página |

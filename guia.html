@@ -28,7 +28,7 @@
         <li>Abrir la demo con el bloqueador de anuncios apagado (Brave Shields, uBlock). Si está prendido, la página lo avisa.</li>
         <li>Tener Braze abierto en otra pestaña, en el workspace <strong>HYPPO</strong>.</li>
         <li>Revisar que estén activas las campañas <strong>[Demo] In-app de prueba</strong> y <strong>[Demo] Oferta por plan</strong>, y el Canvas <strong>[Demo] Carrito abandonado v2</strong> (los links están en cada sección de la demo).</li>
-        <li>Sumar tu usuario como <em>test user</em> (botón "Add As Test User" en su perfil) a un Internal Group con "Record User Events" tildado, para mostrar el Event User Log con el JSON crudo.</li>
+        <li>Para mostrar el Event User Log con el JSON crudo, el usuario con el que presentás tiene que ser <em>test user</em> del Internal Group <strong>Demo Hyppo</strong> (Settings → Internal Groups), que ya tiene "Record User Events" activado. Ya están los perfiles con <code>tomas@hyppo.io</code>; otro usuario se suma desde su perfil con "Add As Test User".</li>
         <li>Practicar una vez antes: los in-app de una campaña recién lanzada aparecen recién en la sesión siguiente.</li>
       </ul>
     </section>
@@ -46,6 +46,7 @@
       <h2>El login une todo en un perfil</h2>
       <p>Completar external ID, email, nombre y plan, y tocar <strong>Identificar</strong>. Abrir el perfil en Braze: los eventos que hizo como anónimo ahora son de este usuario, y aparecen el email, el nombre y el atributo custom <code>plan</code>.</p>
       <img src="assets/guia/demo-identidad.png" alt="Sección de identidad con un usuario identificado">
+      <img src="assets/guia/braze-perfil.png" alt="Perfil del usuario en Braze con su atributo plan" class="wide">
       <p class="tip">Contar la particularidad: <code>changeUser</code> no tiene vuelta atrás, y para "desloguear" se usa <code>wipeData()</code>.</p>
     </section>
 
@@ -68,10 +69,14 @@
       <h2>La orquestación: el momento fuerte de la demo</h2>
       <p>En la tienda, agregar un producto al carrito y no comprar. El usuario entra en el Canvas <strong>[Demo] Carrito abandonado v2</strong>: a los 2 minutos (en producción sería una hora) recibe un email con el producto y el precio, y un in-app que aparece en la sesión siguiente.</p>
       <img src="assets/guia/demo-tienda.png" alt="Tienda de la demo">
+      <img src="assets/guia/braze-canvas-ramas.png" alt="Canvas en Braze: división por plan y experimento de asuntos 50/50">
       <p>Mientras tanto, abrir el Canvas en Braze y recorrer el flujo: entrada por evento, espera, un in-app y después una división por plan. Un usuario free recibe un email que además le ofrece pasar a Pro; uno pro o enterprise entra en un test A/B de asunto (Experiment Path 50/50).</p>
       <p>Para que el cliente lo vea en vivo: repetir el carrito con otro plan y otro email (por ejemplo <code>nombre+free@empresa.com</code> y <code>nombre+pro@empresa.com</code>, que llegan a la misma casilla como dos perfiles distintos) y comparar los dos emails. Con una persona por demo el test A/B no llega a ser significativo: lo que se muestra es cómo se arma y las métricas por variante.</p>
       <p class="tip">El plan viaja como propiedad del evento <code>agrego_al_carrito</code> y el Canvas se divide por esa propiedad, no por el atributo del perfil: si el usuario se acaba de identificar, Braze puede no haber procesado todavía el atributo.</p>
       <p>Cuando llegue el email ("Tu carrito te espera"), abrirlo y tocar <strong>Volver a tu carrito</strong>: la demo reconoce al usuario y destaca el producto. Comprarlo cierra el círculo: en el Canvas se ven el email enviado y el clic, y la compra queda en el perfil del usuario y en Revenue.</p>
+      <img src="assets/guia/braze-canvas-metricas.png" alt="Métricas del Canvas: mensajes, entradas, conversión e ingresos" class="wide">
+      <p>Al final, el historial del usuario en Braze muestra todo el recorrido: los in-app, el email enviado, entregado, abierto y con clic, y el recordatorio del Canvas.</p>
+      <img src="assets/guia/braze-perfil-historial.png" alt="Historial de mensajes del usuario en Braze" class="wide">
       <p class="tip">Si se compra antes de que pasen los 2 minutos, el usuario sale del Canvas y no recibe el email: la salida y la conversión son el evento <code>compro</code>.</p>
     </section>
 
