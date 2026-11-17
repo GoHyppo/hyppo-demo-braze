@@ -45,7 +45,7 @@
         <ul>
           <li><code>changeUser</code> no tiene vuelta atrás: un navegador identificado no vuelve a ser anónimo. Para "desloguear" se usa <code>wipeData()</code>, que borra todo lo local y genera un device nuevo.</li>
           <li>Lo que hizo el usuario mientras era anónimo se fusiona con el perfil identificado si ese external ID todavía no existía.</li>
-          <li>Para encontrarlo en el dashboard: Audience → Search Users, por external ID o email.</li>
+          <li>Para encontrarlo en el dashboard: Audience → Search Users, por external ID o email. Si todavía es anónimo, por el Device ID que se ve arriba.</li>
           <li>Esta demo no usa SDK Authentication (Settings → App Settings), porque necesita un backend que firme un JWT por usuario y esto es un sitio estático. En un cliente real conviene activarla: el backend firma en el login, la web llama a <code>changeUser(id, jwt)</code>, y se prueba primero en "Optional" antes de pasar a "Required".</li>
         </ul>
       </details>
@@ -62,6 +62,7 @@
         <summary>Particularidades</summary>
         <ul>
           <li>El SDK manda los datos en tandas cada pocos segundos. Esta demo llama a <code>requestImmediateDataFlush()</code> después de cada acción para que aparezcan antes.</li>
+          <li>El Event User Log (Settings → Event User Log) solo muestra usuarios de un Internal Group con "Record User Events for group members" tildado, y solo desde que se suman. Si no, el evento se ve en el perfil del usuario.</li>
           <li>Un evento nuevo aparece en Data Settings → Custom Events recién cuando llega el primero. Hasta entonces no se puede elegir como trigger de una campaña.</li>
           <li>Los bloqueadores de anuncios (lista EasyPrivacy: Brave Shields, uBlock) bloquean el CDN del SDK y el envío a <code>braze.eu/api/v3/data/</code>. En un cliente real, los usuarios con bloqueador no llegan a Braze desde la web, y conviene mandar los eventos clave también desde el backend con la REST API.</li>
           <li>Las propiedades del evento se usan en Liquid como <code>{{event_properties.${nombre}}}</code> dentro de una campaña disparada por ese evento.</li>
