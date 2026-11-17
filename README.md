@@ -12,7 +12,8 @@ primera vez, y el panel de la derecha muestra cada llamada al SDK.
 | Archivo | Qué tiene |
 |---|---|
 | `index.html` | Las secciones de la demo |
-| `js/config.js` | API key, SDK endpoint e IDs de los placements de Banners |
+| `js/config.js` | API key, SDK endpoint, IDs de los placements de Banners y de las campañas |
+| `guia.html` | Guía para presentar la demo |
 | `js/app.js` | Toda la integración con el SDK |
 | `css/styles.css` | Estilos con los colores y la tipografía de Hyppo |
 
@@ -27,11 +28,14 @@ Pasar a otra versión es un cambio a mano.
 2. **Banner Placements**: Settings → Banner Placements, crear `demo_home_hero` y `demo_tienda`
    (los IDs tienen que coincidir con `config.js`). Banners depende del paquete contratado; si el
    workspace no lo tiene, el log muestra `FEATURE_DISABLED`.
-3. **Campañas para probar**:
-   - In-app message action-based, trigger *Perform custom event* `demo_inapp`.
-   - Banner sobre `demo_home_hero` y otro sobre `demo_tienda` (por ejemplo, segmentado por el
-     atributo `plan`).
-   - Content Card para todos los usuarios.
+3. **Campañas de la demo** (ya creadas en el sandbox, en borrador; se lanzan antes de presentar):
+   - `[Demo] In-app de prueba`: in-app con trigger `demo_inapp`.
+   - `[Demo] Oferta por plan`: in-app con trigger `demo_boton_clickeado`, texto según el atributo `plan`.
+   - Canvas `[Demo] Carrito abandonado`: entra con `agrego_al_carrito`, espera 2 minutos, email + in-app.
+   - Sus IDs van en `js/config.js` (`campaigns`, `canvases`) para los links "Ver en Braze".
+   - Pendiente: Banners y Content Cards, cuando el sandbox los tenga.
+
+`guia.html` es la guía para presentar la demo paso a paso, con capturas en `assets/guia/`.
 
 ## Correr local
 

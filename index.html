@@ -15,6 +15,7 @@
       <p class="caps">Hyppo · Demo interna</p>
       <h1>Braze Web SDK</h1>
     </div>
+    <a href="guia.html" class="guide-btn">Guía de la demo</a>
     <div id="status" class="status">Sin configurar</div>
   </header>
 
@@ -25,7 +26,7 @@
 
   <main>
     <section class="card" id="identidad">
-      <p class="caps">01 · Identidad</p>
+      <p class="caps">Identidad</p>
       <h2>Identificar al usuario</h2>
       <form id="form-user">
         <label>External ID <input name="external_id" required placeholder="demo-tomas-1"></label>
@@ -40,6 +41,7 @@
         </div>
       </form>
       <p class="muted">Usuario actual: <code id="current-user">anónimo</code> · Device ID: <code id="device-id">—</code></p>
+      <p><a id="user-link" class="braze-link" target="_blank" rel="noopener" href="#">Ver este usuario en Braze ↗</a></p>
       <details>
         <summary>Particularidades</summary>
         <ul>
@@ -52,12 +54,14 @@
     </section>
 
     <section class="card" id="eventos">
-      <p class="caps">02 · Eventos</p>
+      <p class="caps">Eventos</p>
       <h2>Custom events</h2>
       <form id="form-event" class="row">
         <input name="name" value="demo_boton_clickeado" required>
         <button type="submit">Enviar evento</button>
       </form>
+      <p class="muted">Con el evento por defecto se dispara <strong>[Demo] Oferta por plan</strong>: un in-app distinto según el plan del usuario.</p>
+      <p><a class="braze-link" data-braze-link="campaign:ofertaPorPlan">Ver "[Demo] Oferta por plan" en Braze ↗</a></p>
       <details>
         <summary>Particularidades</summary>
         <ul>
@@ -71,12 +75,14 @@
     </section>
 
     <section class="card wide" id="tienda">
-      <p class="caps">03 · Tienda</p>
+      <p class="caps">Tienda</p>
       <h2>Carrito y compras</h2>
       <div class="banner-slot inline" data-placement="tienda">
         <p class="fallback">Placement <code data-placement-id="tienda"></code>: sin banner para este usuario.</p>
       </div>
       <div class="products" id="products"></div>
+      <p class="muted">Agregar al carrito y no comprar hace entrar al usuario en el Canvas <strong>[Demo] Carrito abandonado</strong>: a los 2 minutos manda un email y deja un in-app para la sesión siguiente.</p>
+      <p><a class="braze-link" data-braze-link="canvas:carritoAbandonado">Ver el Canvas "[Demo] Carrito abandonado" en Braze ↗</a></p>
       <details>
         <summary>Particularidades</summary>
         <ul>
@@ -87,9 +93,10 @@
     </section>
 
     <section class="card" id="inapp">
-      <p class="caps">04 · In-app messages</p>
+      <p class="caps">In-app messages</p>
       <h2>Disparar un in-app</h2>
       <button id="btn-inapp">Disparar <code>demo_inapp</code></button>
+      <p><a class="braze-link" data-braze-link="campaign:inappPrueba">Ver "[Demo] In-app de prueba" y su analytics en Braze ↗</a></p>
       <details>
         <summary>Particularidades</summary>
         <ul>
@@ -101,7 +108,7 @@
     </section>
 
     <section class="card" id="banners">
-      <p class="caps">05 · Banners</p>
+      <p class="caps">Banners</p>
       <h2>Banners por placement</h2>
       <p class="muted">Placements de esta página: <code data-placement-id="hero"></code> (arriba) y <code data-placement-id="tienda"></code> (en la tienda).</p>
       <button id="btn-banners">Pedir banners de nuevo</button>
@@ -118,7 +125,7 @@
     </section>
 
     <section class="card" id="cards">
-      <p class="caps">06 · Content Cards</p>
+      <p class="caps">Content Cards</p>
       <h2>Feed de Content Cards</h2>
       <button id="btn-cards">Actualizar feed</button>
       <div id="cards-feed" class="feed"></div>

@@ -9,4 +9,17 @@ window.BRAZE_CONFIG = {
     hero: "demo_home_hero",
     tienda: "demo_tienda",
   },
+
+  // Para los links "Ver en Braze": dashboard del cluster y ID del workspace (sale de cualquier URL del dashboard).
+  dashboard: "https://dashboard-02.braze.eu",
+  workspaceId: "6af7599362e095008e8352fb",
+
+  // Campañas y Canvas de la demo (el ID sale de su URL en el dashboard).
+  campaigns: {
+    inappPrueba: "6afc7e466faec900a9eee0bb",   // [Demo] In-app de prueba
+    ofertaPorPlan: "6afc7f19a02914008ea56367", // [Demo] Oferta por plan
+  },
+  canvases: {
+    carritoAbandonado: "6afc806253eb3a008c3be1f1", // [Demo] Carrito abandonado
+  },
 };

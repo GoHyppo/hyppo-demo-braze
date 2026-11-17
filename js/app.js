@@ -20,9 +20,28 @@ function flush() {
   braze.requestImmediateDataFlush();
 }
 
+// Links al dashboard de Braze, siempre en una pestaña nueva.
+const dashUrl = (path) => `${cfg.dashboard}/${path}/${cfg.workspaceId}`;
+
+function setupBrazeLinks() {
+  document.querySelectorAll("[data-braze-link]").forEach((a) => {
+    const [kind, key] = a.dataset.brazeLink.split(":");
+    a.href = kind === "canvas" ? dashUrl(`engagement/canvas/${cfg.canvases[key]}`)
+      : dashUrl(`engagement/campaigns/${cfg.campaigns[key]}`);
+    a.target = "_blank";
+    a.rel = "noopener";
+  });
+}
+
 function refreshUserInfo() {
-  $("#current-user").textContent = braze.getUser()?.getUserId() || "anónimo";
-  $("#device-id").textContent = braze.getDeviceId() || "—";
+  const userId = braze.getUser()?.getUserId();
+  const deviceId = braze.getDeviceId();
+  $("#current-user").textContent = userId || "anónimo";
+  $("#device-id").textContent = deviceId || "—";
+  // Search Users acepta ?query=; a un anónimo se lo encuentra por device ID.
+  const link = $("#user-link");
+  link.href = `${dashUrl("users/user_search")}?query=${encodeURIComponent(userId || deviceId)}`;
+  link.textContent = userId ? "Ver este usuario en Braze ↗" : "Ver este usuario anónimo en Braze (por device ID) ↗";
 }
 
 function renderBanners(snapshot) {
@@ -131,6 +150,7 @@ function setupUi() {
 }
 
 function init() {
+  setupBrazeLinks();
   document.querySelectorAll("[data-placement-id]").forEach((el) => {
     el.textContent = cfg.bannerPlacements[el.dataset.placementId];
   });

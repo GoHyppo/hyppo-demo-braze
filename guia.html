@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Hyppo · Guía de la demo de Braze</title>
+  <link rel="icon" href="assets/isotipo.png">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&display=swap">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="guide">
+  <header class="top">
+    <img src="assets/isotipo.png" alt="Hyppo" class="logo">
+    <div>
+      <p class="caps">Hyppo · Demo interna</p>
+      <h1>Guía de la demo de Braze</h1>
+    </div>
+    <a href="index.html" class="guide-btn">Volver a la demo</a>
+  </header>
+
+  <article class="guide-body">
+    <p class="lead">Una buena demo cuenta una historia de punta a punta: alguien llega anónimo, se identifica, hace cosas, y Braze reacciona con mensajes personalizados en el momento justo. La regla es mostrar siempre las dos caras: lo que hace el usuario en la web y cómo aparece en Braze. Cada sección de la demo tiene un link que abre el dashboard en otra pestaña.</p>
+
+    <section class="step">
+      <p class="caps">Antes de empezar</p>
+      <h2>Preparar el escenario</h2>
+      <ul>
+        <li>Abrir la demo con el bloqueador de anuncios apagado (Brave Shields, uBlock). Si está prendido, la página lo avisa.</li>
+        <li>Tener Braze abierto en otra pestaña, en el workspace <strong>HYPPO</strong>.</li>
+        <li>Lanzar las campañas <strong>[Demo] In-app de prueba</strong> y <strong>[Demo] Oferta por plan</strong>, y el Canvas <strong>[Demo] Carrito abandonado</strong>. Quedan en borrador para que nadie las lance sin querer.</li>
+        <li>Sumar tu usuario como <em>test user</em> (botón "Add As Test User" en su perfil) a un Internal Group con "Record User Events" tildado, para mostrar el Event User Log con el JSON crudo.</li>
+        <li>Practicar una vez antes: los in-app de una campaña recién lanzada aparecen recién en la sesión siguiente.</li>
+      </ul>
+    </section>
+
+    <section class="step">
+      <p class="caps">Usuario anónimo</p>
+      <h2>Braze ya sabe quién es, aunque no se haya logueado</h2>
+      <p>Apenas carga la página, el SDK abre una sesión y le asigna un device ID. Mostrar el link "Ver este usuario anónimo en Braze": el perfil existe, con sesiones, navegador y país, pero sin external ID.</p>
+      <img src="assets/guia/demo-identidad-anonimo.png" alt="Sección de identidad con un usuario anónimo">
+      <p class="tip">Mensaje para el cliente: no se pierde nada de lo que pasa antes del login.</p>
+    </section>
+
+    <section class="step">
+      <p class="caps">Identificación</p>
+      <h2>El login une todo en un perfil</h2>
+      <p>Completar external ID, email, nombre y plan, y tocar <strong>Identificar</strong>. Abrir el perfil en Braze: los eventos que hizo como anónimo ahora son de este usuario, y aparecen el email, el nombre y el atributo custom <code>plan</code>.</p>
+      <img src="assets/guia/demo-identidad.png" alt="Sección de identidad con un usuario identificado">
+      <p class="tip">Contar la particularidad: <code>changeUser</code> no tiene vuelta atrás, y para "desloguear" se usa <code>wipeData()</code>.</p>
+    </section>
+
+    <section class="step">
+      <p class="caps">Segmentación en vivo</p>
+      <h2>El mismo botón, un mensaje distinto para cada plan</h2>
+      <p>Tocar <strong>Enviar evento</strong>. La campaña <strong>[Demo] Oferta por plan</strong> muestra un in-app según el plan: invita a pasar a pro, ofrece un beneficio o deriva al account manager. Después cambiar el plan, volver a identificarse y repetir: el mensaje cambia.</p>
+      <img src="assets/guia/demo-eventos.png" alt="Sección de eventos">
+      <p class="tip">Acá se ve el valor de los atributos: el contenido lo decide el dato, no el desarrollador.</p>
+    </section>
+
+    <section class="step">
+      <p class="caps">In-app personalizado</p>
+      <h2>Un mensaje con el nombre del usuario</h2>
+      <p>Tocar <strong>Disparar demo_inapp</strong>. Aparece un modal con el nombre que se cargó en el paso 2 (Liquid: <code>{{${first_name}}}</code>). Abrir la campaña en Braze para mostrar el editor y, después, el analytics: impresiones y clicks se suman en el momento.</p>
+    </section>
+
+    <section class="step">
+      <p class="caps">Carrito abandonado</p>
+      <h2>La orquestación: el momento fuerte de la demo</h2>
+      <p>En la tienda, agregar un producto al carrito y no comprar. El usuario entra en el Canvas <strong>[Demo] Carrito abandonado</strong>: a los 2 minutos (en producción sería una hora) recibe un email con el producto y el precio, y un in-app que aparece en la sesión siguiente.</p>
+      <img src="assets/guia/demo-tienda.png" alt="Tienda de la demo">
+      <p>Mientras tanto, abrir el Canvas en Braze y recorrer el flujo: entrada por evento, espera, mensajes en dos canales.</p>
+      <p class="tip">Si se compra antes de que pasen los 2 minutos, el usuario debería salir del Canvas. Esa salida todavía no está configurada (ver "Pendientes").</p>
+    </section>
+
+    <section class="step">
+      <p class="caps">Lo que pasa por debajo</p>
+      <h2>El log del SDK</h2>
+      <p>El panel negro de la derecha muestra cada llamada al SDK con sus datos. Sirve para el público técnico: es exactamente lo que el equipo de desarrollo del cliente tendría que implementar.</p>
+      <img src="assets/guia/demo-log.png" alt="Panel con el log del SDK" class="narrow">
+    </section>
+
+    <section class="step">
+      <p class="caps">Cierre</p>
+      <h2>Lo que conviene mencionar</h2>
+      <ul>
+        <li><strong>Bloqueadores de anuncios:</strong> los usuarios con bloqueador no llegan a Braze desde la web. Los eventos clave (compras, altas) conviene mandarlos también desde el backend con la REST API.</li>
+        <li><strong>SDK Authentication:</strong> en producción, el backend firma un JWT por usuario para que nadie se haga pasar por otro.</li>
+        <li><strong>Más canales:</strong> email, push, WhatsApp, SMS, Banners y Content Cards se orquestan desde el mismo Canvas.</li>
+      </ul>
+    </section>
+
+    <section class="step pending">
+      <p class="caps">Pendientes del sandbox</p>
+      <h2>Lo que todavía no se puede mostrar</h2>
+      <ul>
+        <li><strong>Banners</strong> y <strong>Content Cards</strong> no están habilitados en el sandbox de partner. Ya se pidieron a Braze.</li>
+        <li>El Canvas de carrito abandonado no tiene salida por compra configurada.</li>
+      </ul>
+    </section>
+  </article>
+</body>
+</html>
