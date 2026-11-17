@@ -126,6 +126,9 @@ function setupUi() {
       log('logCustomEvent("agrego_al_carrito")', props);
     } else {
       braze.logPurchase(p.id, p.price, "USD", 1, { origen: "demo-braze" });
+      // Además de la compra, un custom event: en el sandbox el Canvas no ofrece "Makes Purchase"
+      // como conversión ni como salida, pero sí "Performs custom event".
+      braze.logCustomEvent("compro", { producto: p.id, precio: p.price });
       log(`logPurchase("${p.id}", ${p.price}, "USD", 1)`);
     }
     flush();

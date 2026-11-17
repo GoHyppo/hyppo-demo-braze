@@ -68,7 +68,9 @@
       <h2>La orquestación: el momento fuerte de la demo</h2>
       <p>En la tienda, agregar un producto al carrito y no comprar. El usuario entra en el Canvas <strong>[Demo] Carrito abandonado</strong>: a los 2 minutos (en producción sería una hora) recibe un email con el producto y el precio, y un in-app que aparece en la sesión siguiente.</p>
       <img src="assets/guia/demo-tienda.png" alt="Tienda de la demo">
-      <p>Mientras tanto, abrir el Canvas en Braze y recorrer el flujo: entrada por evento, espera, mensajes en dos canales.</p>
+      <p>Mientras tanto, abrir el Canvas en Braze y recorrer el flujo: entrada por evento, espera, un in-app y después una división por plan. Un usuario free recibe un email que además le ofrece pasar a Pro; uno pro o enterprise entra en un test A/B de asunto (Experiment Path 50/50).</p>
+      <p>Para que el cliente lo vea en vivo: repetir el carrito con otro plan y otro email (por ejemplo <code>nombre+free@empresa.com</code> y <code>nombre+pro@empresa.com</code>, que llegan a la misma casilla como dos perfiles distintos) y comparar los dos emails. Con una persona por demo el test A/B no llega a ser significativo: lo que se muestra es cómo se arma y las métricas por variante.</p>
+      <p class="tip">El plan viaja como propiedad del evento <code>agrego_al_carrito</code> y el Canvas se divide por esa propiedad, no por el atributo del perfil: si el usuario se acaba de identificar, Braze puede no haber procesado todavía el atributo.</p>
       <p>Cuando llegue el email ("Tu carrito te espera"), abrirlo y tocar <strong>Volver a tu carrito</strong>: la demo reconoce al usuario y destaca el producto. Comprarlo cierra el círculo: en el Canvas se ven el email enviado y el clic, y la compra queda en el perfil del usuario y en Revenue.</p>
       <p class="tip">Si se compra antes de que pasen los 2 minutos, el usuario debería salir del Canvas. Esa salida todavía no está configurada (ver "Pendientes").</p>
     </section>
