@@ -87,6 +87,7 @@
         <summary>Particularidades</summary>
         <ul>
           <li><code>logPurchase</code> no es un custom event: va a Revenue y a Data Settings → Products, y se filtra con "Purchased product" en los segmentos.</li>
+          <li>El email del carrito abandonado trae un link con <code>?uid={{${user_id}}}&amp;producto=…</code>: al llegar, la web llama a <code>changeUser(uid)</code> y destaca el producto. Braze no identifica solo a quien llega desde un email; hay que pasarlo en el link. En el editor del email, el <code>&amp;</code> va sin escapar.</li>
           <li>"Agregar al carrito" sí es un custom event (<code>agrego_al_carrito</code>) con el producto y el precio como propiedades.</li>
         </ul>
       </details>

@@ -149,6 +149,25 @@ function setupUi() {
   $("#btn-clear").addEventListener("click", () => { $("#log").innerHTML = ""; });
 }
 
+// Llegada desde el email del Canvas: ?uid=<external ID>&producto=<id>.
+// Identifica al usuario (el link lo arma Braze con {{${user_id}}}) y destaca el producto del carrito.
+function handleEmailArrival() {
+  const q = new URLSearchParams(location.search);
+  const uid = q.get("uid");
+  const producto = q.get("producto");
+  if (uid) {
+    braze.changeUser(uid);
+    flush();
+    log("llegada desde el email: changeUser", { uid, producto });
+    refreshUserInfo();
+  }
+  const card = producto && document.querySelector(`[data-buy="${producto}"]`)?.closest(".product");
+  if (card) {
+    card.classList.add("highlight");
+    card.scrollIntoView({ behavior: "smooth", block: "center" });
+  }
+}
+
 function init() {
   setupBrazeLinks();
   document.querySelectorAll("[data-placement-id]").forEach((el) => {
@@ -187,6 +206,7 @@ function init() {
   $("#status").classList.add("ok");
   log("initialize", { baseUrl: cfg.baseUrl });
   refreshUserInfo();
+  handleEmailArrival();
 }
 
 init();

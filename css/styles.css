@@ -51,6 +51,7 @@ details li { margin: 6px 0; line-height: 1.45; }
 
 .products { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 12px; }
 .product { display: grid; gap: 6px; }
+.product.highlight { outline: 2px solid var(--orange); outline-offset: 6px; border-radius: 4px; }
 .thumb { height: 90px; border-radius: 4px; background: var(--grey-05); display: grid; place-items: center; font-weight: 700; color: var(--grey-60); }
 
 .feed { margin-top: 12px; position: relative; min-height: 80px; }
