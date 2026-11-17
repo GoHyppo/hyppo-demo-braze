@@ -28,7 +28,7 @@ Pasar a otra versión es un cambio a mano.
 2. **Banner Placements**: Settings → Banner Placements, crear `demo_home_hero` y `demo_tienda`
    (los IDs tienen que coincidir con `config.js`). Banners depende del paquete contratado; si el
    workspace no lo tiene, el log muestra `FEATURE_DISABLED`.
-3. **Campañas de la demo** (ya creadas en el sandbox, en borrador; se lanzan antes de presentar):
+3. **Campañas de la demo** (creadas en el sandbox y activas desde el 2026-11-17):
    - `[Demo] In-app de prueba`: in-app con trigger `demo_inapp`.
    - `[Demo] Oferta por plan`: in-app con trigger `demo_boton_clickeado`, texto según el atributo `plan`.
    - Canvas `[Demo] Carrito abandonado`: entra con `agrego_al_carrito`, espera 2 minutos, email + in-app.
