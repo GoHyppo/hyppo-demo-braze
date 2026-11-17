@@ -63,6 +63,7 @@
         <ul>
           <li>El SDK manda los datos en tandas cada pocos segundos. Esta demo llama a <code>requestImmediateDataFlush()</code> después de cada acción para que aparezcan antes.</li>
           <li>Un evento nuevo aparece en Data Settings → Custom Events recién cuando llega el primero. Hasta entonces no se puede elegir como trigger de una campaña.</li>
+          <li>Los bloqueadores de anuncios (lista EasyPrivacy: Brave Shields, uBlock) bloquean el CDN del SDK y el envío a <code>braze.eu/api/v3/data/</code>. En un cliente real, los usuarios con bloqueador no llegan a Braze desde la web, y conviene mandar los eventos clave también desde el backend con la REST API.</li>
           <li>Las propiedades del evento se usan en Liquid como <code>{{event_properties.${nombre}}}</code> dentro de una campaña disparada por ese evento.</li>
         </ul>
       </details>

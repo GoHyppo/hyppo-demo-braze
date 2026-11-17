@@ -135,6 +135,14 @@ function init() {
     el.textContent = cfg.bannerPlacements[el.dataset.placementId];
   });
 
+  // EasyPrivacy (Brave Shields, uBlock, etc.) bloquea el CDN del SDK y el envío de datos.
+  if (typeof window.braze === "undefined") {
+    $("#status").textContent = "SDK bloqueado: desactivá el bloqueador para esta página";
+    $("#status").classList.add("err");
+    log("SDK no cargó", "Un bloqueador de anuncios (Brave Shields, uBlock…) bloquea js.appboycdn.com y braze.eu/api/v3/data/. Desactivalo para este sitio y recargá.", "err");
+    return;
+  }
+
   if (!cfg.apiKey || !cfg.baseUrl) {
     $("#status").textContent = "Falta apiKey / baseUrl en js/config.js";
     $("#status").classList.add("err");
@@ -154,11 +162,11 @@ function init() {
   setupBanners();
   braze.openSession();
 
+  setupUi();
   $("#status").textContent = "SDK inicializado";
   $("#status").classList.add("ok");
   log("initialize", { baseUrl: cfg.baseUrl });
   refreshUserInfo();
 }
 
-setupUi();
 init();
