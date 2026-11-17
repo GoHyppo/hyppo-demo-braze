@@ -119,7 +119,9 @@ function setupUi() {
     const p = PRODUCTS.find((x) => x.id === (cartId || buyId));
     if (!p) return;
     if (cartId) {
-      const props = { producto: p.id, precio: p.price };
+      // El plan viaja en el evento: el Canvas se divide por esta propiedad y no por el atributo,
+      // que puede no estar procesado todavía si el usuario se acaba de identificar.
+      const props = { producto: p.id, precio: p.price, plan: $("select[name=plan]").value };
       braze.logCustomEvent("agrego_al_carrito", props);
       log('logCustomEvent("agrego_al_carrito")', props);
     } else {
