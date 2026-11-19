@@ -88,7 +88,6 @@ function setupBanners() {
     log("banners", { placements: Object.keys(event.cacheSnapshot.banners) });
     renderBanners(event.cacheSnapshot);
   });
-  // No hace falta pedirlos acá: openSession() ya los pide (y un pedido antes de la sesión vuelve con error).
 }
 
 function renderProducts(highlight) {
@@ -215,8 +214,10 @@ function init() {
   braze.subscribeToInAppMessage((msg) => log("in-app recibido", msg.message || msg.header || "(sin texto)"));
   braze.subscribeToContentCardsUpdates((cards) => log("content cards", `${cards.cards.length} cards`));
   braze.showContentCards($("#cards-feed"));
-  setupBanners();
   braze.openSession();
+  // Los banners se escuchan y se piden después de abrir la sesión: antes, el SDK responde FEATURE_DISABLED.
+  setupBanners();
+  refreshBanners();
 
   $("#status").textContent = "Conectado a Braze";
   $("#status").classList.add("ok");
