@@ -43,7 +43,9 @@ function setupBrazeLinks() {
     const [kind, key] = a.dataset.link.split(":");
     const id = kind === "canvas" ? cfg.canvases[key] : cfg.campaigns[key];
     if (!id) { a.hidden = true; return; }
-    a.href = dashUrl(`engagement/${kind === "canvas" ? "canvas" : "campaigns"}/${id}`);
+    // Abren la vista de resultados, no el editor: page=-2 en campañas, isEditing=false en Canvas.
+    a.href = kind === "canvas" ? `${dashUrl(`engagement/canvas/${id}`)}?isEditing=false`
+      : `${dashUrl(`engagement/campaigns/${id}`)}?page=-2`;
     a.target = "_blank";
     a.rel = "noopener";
   });
