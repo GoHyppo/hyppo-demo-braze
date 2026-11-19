@@ -16,8 +16,11 @@ window.BRAZE_CONFIG = {
 
   // Campañas y Canvas de la demo (el ID sale de su URL en el dashboard).
   campaigns: {
-    inappPrueba: "6afc7e466faec900a9eee0bb",   // [Demo] In-app de prueba
-    ofertaPorPlan: "6afc7f19a02914008ea56367", // [Demo] Oferta por plan
+    ofertaPorPlan: "6afc7f19a02914008ea56367", // [Demo] Oferta por plan (in-app del paso 4)
+    bannerHero: "6afdfe170aeba5008eccebf4", // [Demo] Banner hero por plan
+    bannerTienda: "6afe055f0a1404008e9cf87d", // [Demo] Banner tienda
+    cardBienvenida: "6afdfbac22b25e009019c374", // [Demo] Card de bienvenida
+    cardPostCompra: "6afe05eb32846e008d6977f2", // [Demo] Card post-compra
   },
   canvases: {
     carritoAbandonado: "6afc9660b31a20008e70dcf8", // [Demo] Carrito abandonado v2

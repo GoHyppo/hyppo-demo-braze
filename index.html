@@ -8,141 +8,167 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&display=swap">
   <link rel="stylesheet" href="css/styles.css">
 </head>
-<body>
-  <header class="top">
+<body class="log-closed">
+  <header class="top"><div class="wrap">
     <img src="assets/isotipo.png" alt="Hyppo" class="logo">
     <div>
-      <p class="caps">Hyppo · Demo interna</p>
-      <h1>Braze Web SDK</h1>
+      <p class="caps">Hyppo · Demo en vivo</p>
+      <h1>Braze en tu web</h1>
     </div>
-    <a href="guia.html" class="guide-btn">Guía de la demo</a>
-    <div id="status" class="status">Sin configurar</div>
-  </header>
+    <div class="top-right">
+      <a class="btn ghost small-btn" href="guia.html" target="_blank" rel="noopener">Guía para presentar ↗</a>
+      <label class="switch"><input type="checkbox" id="toggle-notes"> Notas técnicas</label>
+      <div id="status" class="status">Cargando…</div>
+    </div>
+  </div></header>
 
-  <!-- Placement de banner "hero": arriba de todo, como un anuncio de home -->
-  <section class="banner-slot" data-placement="hero">
-    <p class="fallback">Placement <code data-placement-id="hero"></code>: sin banner para este usuario.</p>
-  </section>
+  <!-- Placement de Banner "hero": Braze dibuja el banner dentro de este div. -->
+  <div class="wrap banner-wrap">
+    <div class="banner-slot" data-placement="hero">
+      <p class="muted">Aquí aparece el banner que manda Braze: uno para visitantes anónimos y otro según tu plan.</p>
+    </div>
+  </div>
 
-  <main>
-    <section class="card" id="identidad">
-      <p class="caps">Identidad</p>
-      <h2>Identificar al usuario</h2>
-      <form id="form-user">
-        <label>External ID <input name="external_id" required placeholder="demo-tomas-1"></label>
-        <label>Email <input name="email" type="email" placeholder="nombre@hyppo.io"></label>
-        <label>Nombre <input name="first_name" placeholder="Tomás"></label>
-        <label>Plan (atributo custom)
-          <select name="plan"><option>free</option><option>pro</option><option>enterprise</option></select>
-        </label>
-        <div class="row">
-          <button type="submit">Identificar</button>
-          <button type="button" id="btn-logout" class="ghost">Cerrar sesión (wipeData)</button>
+  <div class="wrap"><div id="from-email" class="callout" hidden>
+    <strong>Llegaste desde el email.</strong> Braze registró el clic y la web te identificó como <code id="from-email-id"></code>. Compra el producto destacado y mira la conversión en el Canvas.
+  </div></div>
+
+  <main class="wrap">
+    <section class="card step" id="paso-1">
+      <div class="step-body">
+        <p class="caps"><span class="num">1</span>Visitante anónimo</p>
+        <h2>Braze ya te está viendo</h2>
+        <p>Apenas entras, el SDK abre una sesión y te asigna un device ID. Sin saber quién eres, ya puede mostrarte un mensaje: es el banner de arriba.</p>
+      </div>
+      <div class="step-action">
+        <p class="muted">Ahora: <span id="who" class="pill">anónimo</span> · device ID <code id="device-id">—</code></p>
+        <div class="links">
+          <a class="btn ghost" id="link-profile" target="_blank" rel="noopener">Ver tu perfil ↗</a>
+          <a class="btn ghost" data-link="campaign:bannerHero">Ver el banner ↗</a>
         </div>
-      </form>
-      <p class="muted">Usuario actual: <code id="current-user">anónimo</code> · Device ID: <code id="device-id">—</code></p>
-      <p><a id="user-link" class="braze-link" target="_blank" rel="noopener" href="#">Ver este usuario en Braze ↗</a></p>
-      <details>
-        <summary>Particularidades</summary>
+      </div>
+      <details class="notes">
+        <summary>Notas técnicas</summary>
         <ul>
-          <li><code>changeUser</code> no tiene vuelta atrás: un navegador identificado no vuelve a ser anónimo. Para "desloguear" se usa <code>wipeData()</code>, que borra todo lo local y genera un device nuevo.</li>
-          <li>Lo que hizo el usuario mientras era anónimo se fusiona con el perfil identificado si ese external ID todavía no existía.</li>
-          <li>Para encontrarlo en el dashboard: Audience → Search Users, por external ID o email. Si todavía es anónimo, por el Device ID que se ve arriba.</li>
-          <li>Esta demo no usa SDK Authentication (Settings → App Settings), porque necesita un backend que firme un JWT por usuario y esto es un sitio estático. En un cliente real conviene activarla: el backend firma en el login, la web llama a <code>changeUser(id, jwt)</code>, y se prueba primero en "Optional" antes de pasar a "Required".</li>
+          <li>El perfil anónimo existe desde la primera visita, con sesiones, navegador y país. En Audience → Search Users se lo encuentra por device ID (<code>braze.getDeviceId()</code>).</li>
+          <li>El banner es una campaña de <em>Banner</em> sobre el placement <code data-placement-id="hero"></code>, creado antes en Settings → Banner Placements con el mismo ID que usa el código. Su texto lo elige el Liquid según el plan, con un default para quien no tiene.</li>
+          <li>Los Banners se piden al iniciar la sesión y al llamar <code>changeUser</code>. A mano, <code>requestBannersRefresh</code> tiene un límite de 5 pedidos por sesión, con uno nuevo cada 3 minutos.</li>
+          <li>Banners, como los in-app HTML, requieren <code>allowUserSuppliedJavascript: true</code> en el <code>initialize</code>.</li>
         </ul>
       </details>
     </section>
 
-    <section class="card" id="eventos">
-      <p class="caps">Eventos</p>
-      <h2>Custom events</h2>
-      <form id="form-event" class="row">
-        <input name="name" value="demo_boton_clickeado" required>
-        <button type="submit">Enviar evento</button>
-      </form>
-      <p class="muted">Con el evento por defecto se dispara <strong>[Demo] Oferta por plan</strong>: un in-app distinto según el plan del usuario.</p>
-      <p><a class="braze-link" data-braze-link="campaign:ofertaPorPlan">Ver "[Demo] Oferta por plan" en Braze ↗</a></p>
-      <details>
-        <summary>Particularidades</summary>
+    <section class="card step" id="paso-2">
+      <div class="step-body">
+        <p class="caps"><span class="num">2</span>Identificarse</p>
+        <h2>Login o registro</h2>
+        <p>Al identificarte, lo que hiciste como anónimo pasa a tu perfil y el banner cambia según tu plan.</p>
+      </div>
+      <div class="step-action">
+        <form id="form-user">
+          <label>Email (te llega el mail del paso 3) <input name="email" type="email" required placeholder="sofia@gmail.com"></label>
+          <label>Nombre <input name="first_name" placeholder="Sofía"></label>
+          <label>Plan
+            <select name="plan"><option>free</option><option selected>pro</option><option>enterprise</option></select>
+          </label>
+          <button type="submit">Identificarme</button>
+        </form>
+        <p id="identify-hint" class="muted"></p>
+      </div>
+      <details class="notes">
+        <summary>Notas técnicas</summary>
         <ul>
-          <li>El SDK manda los datos en tandas cada pocos segundos. Esta demo llama a <code>requestImmediateDataFlush()</code> después de cada acción para que aparezcan antes.</li>
-          <li>El Event User Log (Settings → Event User Log) solo muestra usuarios de un Internal Group con "Record User Events for group members" tildado, y solo desde que se suman. Si no, el evento se ve en el perfil del usuario.</li>
-          <li>Un evento nuevo aparece en Data Settings → Custom Events recién cuando llega el primero. Hasta entonces no se puede elegir como trigger de una campaña.</li>
-          <li>Los bloqueadores de anuncios (lista EasyPrivacy: Brave Shields, uBlock) bloquean el CDN del SDK y el envío a <code>braze.eu/api/v3/data/</code>. En un cliente real, los usuarios con bloqueador no llegan a Braze desde la web, y conviene mandar los eventos clave también desde el backend con la REST API.</li>
-          <li>Las propiedades del evento se usan en Liquid como <code>{{event_properties.${nombre}}}</code> dentro de una campaña disparada por ese evento.</li>
+          <li><code>changeUser(id)</code> + <code>setEmail</code>, <code>setFirstName</code> y el atributo custom <code>plan</code>. El ID es <code>demo-</code> + el email normalizado: el mismo email vuelve al mismo perfil.</li>
+          <li>Lo que hizo como anónimo se fusiona con el perfil identificado si ese external ID todavía no existía.</li>
+          <li><code>changeUser</code> no tiene vuelta atrás: un navegador identificado no vuelve a ser anónimo. "Empezar de nuevo" (en el panel negro) es <code>wipeData()</code>, que borra todo lo local y genera un device nuevo.</li>
+          <li>El <code>changeUser</code> ya pide los banners, pero Braze tarda unos 20 segundos en guardar el plan: la demo los vuelve a pedir a los 15 y a los 30 segundos. Los Banners se arman cuando se piden, con el perfil de ese momento.</li>
+          <li>Esta demo no usa SDK Authentication, porque necesita un backend que firme un JWT por usuario (<code>changeUser(id, jwt)</code>). En un cliente real conviene activarla: primero "Optional", después "Required".</li>
         </ul>
       </details>
     </section>
 
-    <section class="card wide" id="tienda">
-      <p class="caps">Tienda</p>
-      <h2>Carrito y compras</h2>
-      <div class="banner-slot inline" data-placement="tienda">
-        <p class="fallback">Placement <code data-placement-id="tienda"></code>: sin banner para este usuario.</p>
+    <section class="card step" id="paso-3">
+      <div class="step-body">
+        <p class="caps"><span class="num">3</span>Carrito abandonado → email → web</p>
+        <h2>Un email distinto según el plan</h2>
+        <p>Agrega un producto al carrito y no lo compres. A los 2 minutos, un Canvas te deja un in-app y te manda un email: a quien es free le ofrece pasar a Pro; a quien es pro o enterprise, el email con dos asuntos distintos en un test A/B. El botón del correo vuelve a esta página ya identificado y con el producto destacado. Si lo compras, cuenta como conversión.</p>
+      </div>
+      <div class="step-action">
+        <p id="cart-hint" class="muted">Primero identifícate con tu email en el paso 2.</p>
+        <div class="links">
+          <a class="btn ghost" data-link="canvas:carritoAbandonado">Ver el Canvas ↗</a>
+        </div>
+      </div>
+      <div class="banner-slot" data-placement="tienda">
+        <p class="muted">Aquí va el banner de la tienda (placement <code data-placement-id="tienda"></code>).</p>
       </div>
       <div class="products" id="products"></div>
-      <p class="muted">Agregar al carrito y no comprar hace entrar al usuario en el Canvas <strong>[Demo] Carrito abandonado v2</strong>: a los 2 minutos deja un in-app para la sesión siguiente y manda un email distinto según el plan (free recibe una oferta para pasar a Pro; pro y enterprise entran en un test A/B de asunto). Comprar lo saca del Canvas.</p>
-      <p><a class="braze-link" data-braze-link="canvas:carritoAbandonado">Ver el Canvas "[Demo] Carrito abandonado v2" en Braze ↗</a></p>
-      <details>
-        <summary>Particularidades</summary>
+      <details class="notes">
+        <summary>Notas técnicas</summary>
         <ul>
-          <li>Al comprar, la demo manda además el custom event <code>compro</code>: el Canvas de carrito abandonado lo usa como conversión y como salida, porque en este sandbox el editor no ofrece "Makes Purchase".</li>
-          <li><code>logPurchase</code> no es un custom event: va a Revenue y a Data Settings → Products, y se filtra con "Purchased product" en los segmentos.</li>
-          <li>El email del carrito abandonado trae un link con <code>?uid={{${user_id}}}&amp;producto=…</code>: al llegar, la web llama a <code>changeUser(uid)</code> y destaca el producto. Braze no identifica solo a quien llega desde un email; hay que pasarlo en el link. En el editor del email, el <code>&amp;</code> va sin escapar.</li>
-          <li>"Agregar al carrito" sí es un custom event (<code>agrego_al_carrito</code>) con el producto (ID y nombre), el precio y el plan como propiedades. El Canvas se divide por el plan del evento y no por el atributo del perfil: si el usuario se acaba de identificar, Braze puede no haber procesado todavía el atributo.</li>
+          <li>"Al carrito" manda el custom event <code>agrego_al_carrito</code> con el producto, el nombre, el precio y el plan. El Canvas entra con ese evento, espera 2 minutos, copia el plan a una variable con un paso de Context y se divide con Audience Paths: Audience Paths no filtra directo por propiedades del evento de entrada.</li>
+          <li>El plan viaja en el evento y no se lee del perfil: si la persona se acaba de identificar, Braze puede no haber procesado todavía el atributo.</li>
+          <li>La rama de pro y enterprise es un Experiment Path 50/50 de asunto. Experiment Paths exige un conversion event, y a un Canvas activo no se le puede agregar uno: hay que configurarlo antes de lanzar.</li>
+          <li>"Comprar" es <code>logPurchase</code> (va a Revenue y a Data Settings → Products) más el custom event <code>compro</code>, que el Canvas usa como conversión y como salida: en este sandbox el editor no ofrece "Makes Purchase".</li>
+          <li>Braze no identifica solo a quien llega desde un email: el link lleva <code>?uid={{${user_id}}}&amp;producto=…</code> y la web llama a <code>changeUser(uid)</code>.</li>
+          <li>El banner de arriba de los productos es otra campaña de Banner, sobre el placement <code data-placement-id="tienda"></code>.</li>
         </ul>
       </details>
     </section>
 
-    <section class="card" id="inapp">
-      <p class="caps">In-app messages</p>
-      <h2>Disparar un in-app</h2>
-      <button id="btn-inapp">Disparar <code>demo_inapp</code></button>
-      <p><a class="braze-link" data-braze-link="campaign:inappPrueba">Ver "[Demo] In-app de prueba" y su analytics en Braze ↗</a></p>
-      <details>
-        <summary>Particularidades</summary>
+    <section class="card step" id="paso-4">
+      <div class="step-body">
+        <p class="caps"><span class="num">4</span>In-app</p>
+        <h2>Un mensaje sobre la web, según tu plan</h2>
+        <p>Haz algo en la web y Braze responde en el momento con un modal. El mismo botón muestra un mensaje distinto a cada plan: cambia el plan en el paso 2 y vuelve a probar.</p>
+      </div>
+      <div class="step-action">
+        <div><button id="btn-inapp">Disparar el in-app</button></div>
+        <div class="links">
+          <a class="btn ghost" data-link="campaign:ofertaPorPlan">Ver la campaña ↗</a>
+        </div>
+      </div>
+      <details class="notes">
+        <summary>Notas técnicas</summary>
         <ul>
-          <li>Crear una campaña In-App Message action-based con trigger "Perform custom event: demo_inapp".</li>
-          <li>El SDK baja los triggers al iniciar la sesión. Una campaña recién lanzada no aparece hasta la sesión siguiente: cerrar sesión con el botón de arriba y volver a identificarse.</li>
-          <li>Los mensajes HTML custom requieren <code>allowUserSuppliedJavascript: true</code>, que esta demo ya tiene.</li>
+          <li>El botón manda el custom event <code>demo_boton_clickeado</code>; una campaña In-App Message action-based responde con un modal cuyo texto elige el Liquid según el plan.</li>
+          <li>El SDK baja los triggers y arma el mensaje al iniciar la sesión, no al mostrarlo. Por eso la campaña tiene tildado "Re-evaluate campaign eligibility before displaying": si no, quien se identificó en la misma sesión ve el texto por default.</li>
+          <li>Una campaña recién lanzada aparece recién en la sesión siguiente, y el SDK espera 30 segundos entre dos in-app.</li>
         </ul>
       </details>
     </section>
 
-    <section class="card" id="banners">
-      <p class="caps">Banners</p>
-      <h2>Banners por placement</h2>
-      <p class="muted">Placements de esta página: <code data-placement-id="hero"></code> (arriba) y <code data-placement-id="tienda"></code> (en la tienda).</p>
-      <button id="btn-banners">Pedir banners de nuevo</button>
-      <details>
-        <summary>Particularidades</summary>
+    <section class="card step" id="paso-5">
+      <div class="step-body">
+        <p class="caps"><span class="num">5</span>Content Cards</p>
+        <h2>Mensajes que quedan en la web</h2>
+        <p>A diferencia del in-app, una card queda en el feed hasta que la descartas o vence. Ya tienes una de bienvenida; cuando compras algo en el paso 3, llega otra que te agradece la compra.</p>
+      </div>
+      <div class="step-action">
+        <div id="cards-feed"></div>
+        <div class="links">
+          <a class="btn ghost" data-link="campaign:cardBienvenida">Ver la card de bienvenida ↗</a>
+          <a class="btn ghost" data-link="campaign:cardPostCompra">Ver la card post-compra ↗</a>
+        </div>
+      </div>
+      <details class="notes">
+        <summary>Notas técnicas</summary>
         <ul>
-          <li>Los placements se crean antes en Settings → Banner Placements, con el mismo ID que usa el código. Después se arma una campaña de Banner por placement.</li>
-          <li>Banners depende del paquete contratado: si el workspace no lo tiene, el SDK devuelve <code>FEATURE_DISABLED</code> (lo muestra el log).</li>
-          <li>Se refrescan al iniciar sesión y al llamar <code>changeUser</code>. A mano, <code>requestBannersRefresh</code> tiene un límite: 5 pedidos por sesión, y se recupera uno cada 3 minutos.</li>
-          <li>Si el usuario no califica para ningún banner, el placement vuelve vacío y se muestra el contenido de fallback.</li>
-          <li>Requieren <code>allowUserSuppliedJavascript: true</code> en el <code>initialize</code>.</li>
-        </ul>
-      </details>
-    </section>
-
-    <section class="card" id="cards">
-      <p class="caps">Content Cards</p>
-      <h2>Feed de Content Cards</h2>
-      <button id="btn-cards">Actualizar feed</button>
-      <div id="cards-feed" class="feed"></div>
-      <details>
-        <summary>Particularidades</summary>
-        <ul>
-          <li>A diferencia del in-app, las cards quedan en el feed hasta que el usuario las descarta o vencen.</li>
-          <li><code>showContentCards</code> dibuja el feed con el estilo de Braze dentro del contenedor que se le pasa.</li>
+          <li><code>showContentCards</code> dibuja el feed con el estilo de Braze dentro del contenedor que se le pasa; con <code>getCachedContentCards()</code> se puede armar uno propio.</li>
+          <li>La de bienvenida se crea "en la primera impresión": la ven también los usuarios nuevos, no solo los que existían al lanzarla.</li>
+          <li>La post-compra es action-based con trigger <code>compro</code> y lee el producto de las propiedades del evento. Tarda unos 20 segundos en estar disponible: la demo vuelve a pedir el feed a los 15 y a los 30 segundos. Vence a los 7 días y se puede volver a recibir al minuto.</li>
         </ul>
       </details>
     </section>
   </main>
 
+  <button type="button" id="btn-log-open" class="log-tab">Ver lo que la web le manda a Braze (<span id="log-count">0</span>)</button>
   <aside class="log">
-    <div class="log-head"><span class="caps">Log del SDK</span><button id="btn-clear" class="ghost small">Limpiar</button></div>
+    <div class="log-head">
+      <span class="caps">Lo que la web le manda a Braze</span>
+      <button type="button" id="btn-reset" class="ghost small">Empezar de nuevo</button>
+      <button type="button" id="btn-log-close" class="ghost small" aria-label="Minimizar el panel">—</button>
+    </div>
     <ol id="log"></ol>
   </aside>
 

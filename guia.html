@@ -3,93 +3,113 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Hyppo · Guía de la demo de Braze</title>
+  <title>Hyppo · Guía de la demo Braze</title>
   <link rel="icon" href="assets/isotipo.png">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&display=swap">
   <link rel="stylesheet" href="css/styles.css">
 </head>
 <body class="guide">
-  <header class="top">
+  <header class="top"><div class="wrap">
     <img src="assets/isotipo.png" alt="Hyppo" class="logo">
     <div>
-      <p class="caps">Hyppo · Demo interna</p>
-      <h1>Guía de la demo de Braze</h1>
+      <p class="caps">Hyppo · Guía para presentar</p>
+      <h1>Demo de Braze, paso a paso</h1>
     </div>
-    <a href="index.html" class="guide-btn">Volver a la demo</a>
-  </header>
+    <div class="top-right">
+      <a class="btn" href="./">Abrir la demo</a>
+    </div>
+  </div></header>
 
-  <article class="guide-body">
-    <p class="lead">Una buena demo cuenta una historia de punta a punta: alguien llega anónimo, se identifica, hace cosas, y Braze reacciona con mensajes personalizados en el momento justo. La regla es mostrar siempre las dos caras: lo que hace el usuario en la web y cómo aparece en Braze. Cada sección de la demo tiene un link que abre el dashboard en otra pestaña.</p>
-
-    <section class="step">
-      <p class="caps">Antes de empezar</p>
-      <h2>Preparar el escenario</h2>
-      <ul>
-        <li>Abrir la demo con el bloqueador de anuncios apagado (Brave Shields, uBlock). Si está prendido, la página lo avisa.</li>
-        <li>Tener Braze abierto en otra pestaña, en el workspace <strong>HYPPO</strong>.</li>
-        <li>Revisar que estén activas las campañas <strong>[Demo] In-app de prueba</strong> y <strong>[Demo] Oferta por plan</strong>, y el Canvas <strong>[Demo] Carrito abandonado v2</strong> (los links están en cada sección de la demo).</li>
-        <li>Para mostrar el Event User Log con el JSON crudo, el usuario con el que presentás tiene que ser <em>test user</em> del Internal Group <strong>Demo Hyppo</strong> (Settings → Internal Groups), que ya tiene "Record User Events" activado. Ya están los perfiles con <code>tomas@hyppo.io</code>; otro usuario se suma desde su perfil con "Add As Test User".</li>
-        <li>Practicar una vez antes: los in-app de una campaña recién lanzada aparecen recién en la sesión siguiente.</li>
-      </ul>
+  <main class="guide-main wrap">
+    <section class="card">
+      <h2>Antes de la reunión</h2>
+      <ol>
+        <li>La demo cuenta la misma historia que la de Customer.io: usá "Sofía" como nombre y un plan (free, pro o enterprise).</li>
+        <li>Abrí la demo en el navegador que vas a compartir y <strong>bajá el bloqueador de anuncios</strong> para el sitio (Brave Shields, uBlock). Si está activo, arriba a la derecha dice "Bloqueado".</li>
+        <li><strong>Hacé el recorrido una vez con tu email.</strong> Así ves que estén activas las campañas y el Canvas (los links "↗" de cada paso).</li>
+        <li>Abrí el panel de abajo a la derecha y tocá <strong>Empezar de nuevo</strong> para arrancar la reunión como visitante anónimo.</li>
+        <li>Dejá Braze abierto y logueado en otra pestaña, en el workspace <strong>HYPPO</strong>: los links "↗" abren ahí.</li>
+        <li>Para mostrar el Event User Log con el JSON crudo, tu perfil tiene que estar en el Internal Group <strong>Demo Hyppo</strong> (Settings → Internal Groups). Se suma desde el perfil con "Add As Test User".</li>
+        <li>Tené a mano tu casilla de email para el paso 3. El remitente del sandbox cae en Promociones de Gmail.</li>
+      </ol>
+      <p class="muted">La demo usa el sandbox de partner "HYPPO" (EU-02). Todo lo que pase en la reunión queda ahí, con perfiles <code>demo-…</code>.</p>
     </section>
 
-    <section class="step">
-      <p class="caps">Usuario anónimo</p>
-      <h2>Braze ya sabe quién es, aunque no se haya logueado</h2>
-      <p>Apenas carga la página, el SDK abre una sesión y le asigna un device ID. Mostrar el link "Ver este usuario anónimo en Braze": el perfil existe, con sesiones, navegador y país, pero sin external ID.</p>
-      <img src="assets/guia/demo-identidad-anonimo.png" alt="Sección de identidad con un usuario anónimo">
-      <p class="tip">Mensaje para el cliente: no se pierde nada de lo que pasa antes del login.</p>
+    <section class="card">
+      <p class="caps">Paso 1 · Visitante anónimo</p>
+      <h2>"Braze te reconoce antes de saber quién sos"</h2>
+      <figure><img src="assets/guia/1-anonimo.png" alt="Banner para visitantes anónimos arriba de la demo"></figure>
+      <dl>
+        <dt>Qué decir</dt>
+        <dd>Apenas alguien entra a la web, Braze le asigna un device ID y ya puede mostrarle mensajes. El banner de arriba lo ve cualquier visitante, sin login. No se pierde nada de lo que pasa antes del registro.</dd>
+        <dt>Qué hacer</dt>
+        <dd>Señalá el banner. Para mostrar lo técnico, abrí el panel con el botón de abajo a la derecha: la sesión y el pedido de banners ya salieron.</dd>
+        <dt>Qué mostrar en Braze</dt>
+        <dd>"Ver tu perfil ↗": el perfil anónimo, con sesiones, navegador y país, sin external ID. "Ver el banner ↗": la campaña de Banner y su placement.</dd>
+      </dl>
     </section>
 
-    <section class="step">
-      <p class="caps">Identificación</p>
-      <h2>El login une todo en un perfil</h2>
-      <p>Completar external ID, email, nombre y plan, y tocar <strong>Identificar</strong>. Abrir el perfil en Braze: los eventos que hizo como anónimo ahora son de este usuario, y aparecen el email, el nombre y el atributo custom <code>plan</code>.</p>
-      <img src="assets/guia/demo-identidad.png" alt="Sección de identidad con un usuario identificado">
-      <img src="assets/guia/braze-perfil.png" alt="Perfil del usuario en Braze con su atributo plan" class="wide">
-      <p class="tip">Contar la particularidad: <code>changeUser</code> no tiene vuelta atrás, y para "desloguear" se usa <code>wipeData()</code>.</p>
+    <section class="card">
+      <p class="caps">Paso 2 · Identificarse</p>
+      <h2>"Cuando se registra, el mensaje cambia solo"</h2>
+      <figure><img src="assets/guia/2-identificado.png" alt="El banner con el texto del plan de la persona identificada"></figure>
+      <figure><img src="assets/guia/braze-perfil.png" alt="Perfil del usuario en Braze con su atributo plan"></figure>
+      <dl>
+        <dt>Qué decir</dt>
+        <dd>Al loguearse, todo lo que hizo como anónimo pasa a su perfil. El banner se arma con sus datos: si cambia el plan, cambia el mensaje. El contenido lo decide el dato, no el desarrollador.</dd>
+        <dt>Qué hacer</dt>
+        <dd>Completá email, nombre y plan y tocá "Identificarme". En unos 20 segundos el banner cambia por el del plan: es lo que tarda Braze en guardar el dato. Mientras, mostrá el perfil.</dd>
+        <dt>Qué mostrar en Braze</dt>
+        <dd>"Ver tu perfil ↗" del paso 1: ahora es el perfil identificado, con el email, el nombre y el atributo custom <code>plan</code>, y la actividad de antes de identificarse.</dd>
+      </dl>
     </section>
 
-    <section class="step">
-      <p class="caps">Segmentación en vivo</p>
-      <h2>El mismo botón, un mensaje distinto para cada plan</h2>
-      <p>Tocar <strong>Enviar evento</strong>. La campaña <strong>[Demo] Oferta por plan</strong> muestra un in-app según el plan: invita a pasar a pro, ofrece un beneficio o deriva al account manager. Después cambiar el plan, volver a identificarse y repetir: el mensaje cambia.</p>
-      <img src="assets/guia/demo-eventos.png" alt="Sección de eventos">
-      <p class="tip">Acá se ve el valor de los atributos: el contenido lo decide el dato, no el desarrollador.</p>
+    <section class="card">
+      <p class="caps">Paso 3 · Carrito abandonado → email → web</p>
+      <h2>"La orquestación: un email distinto para cada cliente, que trae ventas y se puede medir"</h2>
+      <figure><img src="assets/guia/braze-canvas-ramas.png" alt="Canvas en Braze: división por plan y experimento de asuntos 50/50"></figure>
+      <dl>
+        <dt>Qué decir</dt>
+        <dd>Si alguien deja algo en el carrito, Braze lo sigue: a los 2 minutos (en producción sería una hora) le deja un mensaje en la web y le manda un email. El email depende del plan: a un free le ofrece pasar a Pro; a un pro o enterprise le llega con uno de dos asuntos, en un test A/B que dice cuál vende más. El botón del email vuelve a la web reconociendo a la persona, y si compra, sale del Canvas y cuenta como conversión.</dd>
+        <dt>Qué hacer</dt>
+        <dd>"Al carrito" en un producto y no lo compres. Mientras esperás, abrí el Canvas. Cuando llegue el email ("Tu carrito te espera"), tocá "Volver a tu carrito": la demo te identifica y destaca el producto. Compralo. Para mostrar las dos ramas, repetí con otro plan y otro email (<code>nombre+free@…</code> y <code>nombre+pro@…</code> llegan a la misma casilla como dos perfiles).</dd>
+        <dt>Qué mostrar en Braze</dt>
+        <dd>"Ver el Canvas ↗": entrada por evento, espera, in-app, la división por plan y el experimento; después, las métricas: entradas, emails, clics, conversión e ingresos. En el perfil, el historial de mensajes muestra todo el recorrido.</dd>
+      </dl>
+      <figure><img src="assets/guia/braze-canvas-metricas.png" alt="Métricas del Canvas: mensajes, entradas, conversión e ingresos"></figure>
+      <figure><img src="assets/guia/braze-perfil-historial.png" alt="Historial de mensajes del usuario en Braze"></figure>
     </section>
 
-    <section class="step">
-      <p class="caps">In-app personalizado</p>
-      <h2>Un mensaje con el nombre del usuario</h2>
-      <p>Tocar <strong>Disparar demo_inapp</strong>. Aparece un modal con el nombre que se cargó en el paso 2 (Liquid: <code>{{${first_name}}}</code>). Abrir la campaña en Braze para mostrar el editor y, después, el analytics: impresiones y clicks se suman en el momento.</p>
+    <section class="card">
+      <p class="caps">Paso 4 · In-app</p>
+      <h2>"Responder en el momento, dentro de la web"</h2>
+      <figure><img src="assets/guia/4-inapp.png" alt="Modal in-app de Braze sobre la demo"></figure>
+      <dl>
+        <dt>Qué decir</dt>
+        <dd>Cualquier evento de la web puede disparar un mensaje en pantalla, sin tocar código: el marketing lo arma en Braze. Y el mismo botón le muestra algo distinto a cada plan.</dd>
+        <dt>Qué hacer</dt>
+        <dd>"Disparar el in-app": aparece el modal del plan. Para mostrar la segmentación, cambiá el plan en el paso 2, identificate de nuevo y repetí (el SDK espera 30 segundos entre dos in-app).</dd>
+        <dt>Qué mostrar en Braze</dt>
+        <dd>"Ver la campaña ↗": el trigger por evento, el Liquid que elige el texto y las impresiones y clics, que se suman en el momento.</dd>
+      </dl>
     </section>
 
-    <section class="step">
-      <p class="caps">Carrito abandonado</p>
-      <h2>La orquestación: el momento fuerte de la demo</h2>
-      <p>En la tienda, agregar un producto al carrito y no comprar. El usuario entra en el Canvas <strong>[Demo] Carrito abandonado v2</strong>: a los 2 minutos (en producción sería una hora) recibe un email con el producto y el precio, y un in-app que aparece en la sesión siguiente.</p>
-      <img src="assets/guia/demo-tienda.png" alt="Tienda de la demo">
-      <img src="assets/guia/braze-canvas-ramas.png" alt="Canvas en Braze: división por plan y experimento de asuntos 50/50">
-      <p>Mientras tanto, abrir el Canvas en Braze y recorrer el flujo: entrada por evento, espera, un in-app y después una división por plan. Un usuario free recibe un email que además le ofrece pasar a Pro; uno pro o enterprise entra en un test A/B de asunto (Experiment Path 50/50).</p>
-      <p>Para que el cliente lo vea en vivo: repetir el carrito con otro plan y otro email (por ejemplo <code>nombre+free@empresa.com</code> y <code>nombre+pro@empresa.com</code>, que llegan a la misma casilla como dos perfiles distintos) y comparar los dos emails. Con una persona por demo el test A/B no llega a ser significativo: lo que se muestra es cómo se arma y las métricas por variante.</p>
-      <p class="tip">El plan viaja como propiedad del evento <code>agrego_al_carrito</code> y el Canvas se divide por esa propiedad, no por el atributo del perfil: si el usuario se acaba de identificar, Braze puede no haber procesado todavía el atributo.</p>
-      <p>Cuando llegue el email ("Tu carrito te espera"), abrirlo y tocar <strong>Volver a tu carrito</strong>: la demo reconoce al usuario y destaca el producto. Comprarlo cierra el círculo: en el Canvas se ven el email enviado y el clic, y la compra queda en el perfil del usuario y en Revenue.</p>
-      <img src="assets/guia/braze-canvas-metricas.png" alt="Métricas del Canvas: mensajes, entradas, conversión e ingresos" class="wide">
-      <p>Al final, el historial del usuario en Braze muestra todo el recorrido: los in-app, el email enviado, entregado, abierto y con clic, y el recordatorio del Canvas.</p>
-      <img src="assets/guia/braze-perfil-historial.png" alt="Historial de mensajes del usuario en Braze" class="wide">
-      <p class="tip">Si se compra antes de que pasen los 2 minutos, el usuario sale del Canvas y no recibe el email: la salida y la conversión son el evento <code>compro</code>.</p>
+    <section class="card">
+      <p class="caps">Paso 5 · Content Cards</p>
+      <h2>"Mensajes que no se pierden"</h2>
+      <figure><img src="assets/guia/5-cards.png" alt="Feed de Content Cards con la card de bienvenida y la de la compra"></figure>
+      <dl>
+        <dt>Qué decir</dt>
+        <dd>Un in-app se ve una vez; una Content Card queda en la web, como una bandeja de entrada, hasta que la persona la descarta o vence. Sirve para bienvenidas, beneficios o seguimiento de una compra.</dd>
+        <dt>Qué hacer</dt>
+        <dd>Mostrá la card de bienvenida. Después de comprar en el paso 3, en unos 20 segundos aparece la que agradece la compra con el producto.</dd>
+        <dt>Qué mostrar en Braze</dt>
+        <dd>"Ver la card de bienvenida ↗" y "Ver la card post-compra ↗": una para todos, la otra disparada por la compra.</dd>
+      </dl>
     </section>
 
-    <section class="step">
-      <p class="caps">Lo que pasa por debajo</p>
-      <h2>El log del SDK</h2>
-      <p>El panel negro de la derecha muestra cada llamada al SDK con sus datos. Sirve para el público técnico: es exactamente lo que el equipo de desarrollo del cliente tendría que implementar.</p>
-      <img src="assets/guia/demo-log.png" alt="Panel con el log del SDK" class="narrow">
-    </section>
-
-    <section class="step">
-      <p class="caps">Cierre</p>
-      <h2>Lo que conviene mencionar</h2>
+    <section class="card">
+      <h2>Para cerrar</h2>
       <ul>
         <li><strong>Bloqueadores de anuncios:</strong> los usuarios con bloqueador no llegan a Braze desde la web. Los eventos clave (compras, altas) conviene mandarlos también desde el backend con la REST API.</li>
         <li><strong>SDK Authentication:</strong> en producción, el backend firma un JWT por usuario para que nadie se haga pasar por otro.</li>
@@ -97,13 +117,16 @@
       </ul>
     </section>
 
-    <section class="step pending">
-      <p class="caps">Pendientes del sandbox</p>
-      <h2>Lo que todavía no se puede mostrar</h2>
+    <section class="card">
+      <h2>Si algo no aparece</h2>
       <ul>
-        <li><strong>Banners</strong> y <strong>Content Cards</strong> no están habilitados en el sandbox de partner. Ya se pidieron a Braze.</li>
+        <li><strong>"Bloqueado" arriba a la derecha:</strong> bajá el bloqueador de anuncios y recargá.</li>
+        <li><strong>El in-app no llega:</strong> una campaña recién lanzada aparece en la sesión siguiente; y si el modal sale con el texto por default, Braze todavía no guardó el plan: esperá unos segundos y repetí.</li>
+        <li><strong>El banner no cambia al identificarse:</strong> la demo lo vuelve a pedir a los 15 y a los 30 segundos. El SDK permite 5 pedidos por sesión: si te identificaste varias veces, "Empezar de nuevo".</li>
+        <li><strong>La card de la compra no aparece:</strong> tarda unos 20 segundos; la demo vuelve a pedir el feed a los 15 y a los 30.</li>
+        <li><strong>El email no llega:</strong> buscalo en Promociones o en spam. Si compraste antes de los 2 minutos, saliste del Canvas y no se manda.</li>
       </ul>
     </section>
-  </article>
+  </main>
 </body>
 </html>

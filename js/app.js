@@ -3,8 +3,8 @@ const $ = (sel) => document.querySelector(sel);
 
 const PRODUCTS = [
   { id: "remera-hyppo", name: "Remera Hyppo", price: 25 },
-  { id: "buzo-hyppo", name: "Buzo Hyppo", price: 60 },
-  { id: "taza-hyppo", name: "Taza Hyppo", price: 12 },
+  { id: "buzo-hyppo", name: "Buzo Hyppo", price: 64 },
+  { id: "gorra-hyppo", name: "Gorra Hyppo", price: 22 },
 ];
 
 function log(method, detail = "", kind = "") {
@@ -12,98 +12,89 @@ function log(method, detail = "", kind = "") {
   li.className = kind;
   li.innerHTML = `<span class="t">${new Date().toLocaleTimeString()}</span> <code>${method}</code> ${detail ? `<pre>${typeof detail === "string" ? detail : JSON.stringify(detail, null, 2)}</pre>` : ""}`;
   $("#log").prepend(li);
+  countLog();
   console.log("[braze]", method, detail);
+}
+function countLog() { $("#log-count").textContent = $("#log").children.length; }
+
+// El log, y si el panel está abierto, sobreviven a las recargas de la demo (solo en esta pestaña).
+const LOG_KEY = "braze-demo-log";
+const LOG_OPEN_KEY = "braze-demo-log-open";
+function saveLog() {
+  try { sessionStorage.setItem(LOG_KEY, $("#log").innerHTML); } catch (e) { /* sin storage, se pierde el log */ }
+}
+function restoreLog() {
+  try { $("#log").innerHTML = sessionStorage.getItem(LOG_KEY) || ""; } catch (e) { /* idem */ }
+  countLog();
+  try { setLogOpen(sessionStorage.getItem(LOG_OPEN_KEY) === "1"); } catch (e) { /* queda minimizado */ }
+}
+function setLogOpen(open) {
+  document.body.classList.toggle("log-closed", !open);
+  try { sessionStorage.setItem(LOG_OPEN_KEY, open ? "1" : "0"); } catch (e) { /* sin storage */ }
 }
 
 // Cada acción manda los datos en el momento, para verlos rápido en el dashboard.
-function flush() {
-  braze.requestImmediateDataFlush();
-}
+function flush() { braze.requestImmediateDataFlush(); }
 
 // Links al dashboard de Braze, siempre en una pestaña nueva.
 const dashUrl = (path) => `${cfg.dashboard}/${path}/${cfg.workspaceId}`;
-
 function setupBrazeLinks() {
-  document.querySelectorAll("[data-braze-link]").forEach((a) => {
-    const [kind, key] = a.dataset.brazeLink.split(":");
-    a.href = kind === "canvas" ? dashUrl(`engagement/canvas/${cfg.canvases[key]}`)
-      : dashUrl(`engagement/campaigns/${cfg.campaigns[key]}`);
+  document.querySelectorAll("[data-link]").forEach((a) => {
+    const [kind, key] = a.dataset.link.split(":");
+    const id = kind === "canvas" ? cfg.canvases[key] : cfg.campaigns[key];
+    if (!id) { a.hidden = true; return; }
+    a.href = dashUrl(`engagement/${kind === "canvas" ? "canvas" : "campaigns"}/${id}`);
     a.target = "_blank";
     a.rel = "noopener";
   });
 }
 
+const currentUserId = () => braze.getUser()?.getUserId() || null;
+
 function refreshUserInfo() {
-  const userId = braze.getUser()?.getUserId();
+  const id = currentUserId();
   const deviceId = braze.getDeviceId();
-  $("#current-user").textContent = userId || "anónimo";
+  $("#who").textContent = id ? `identificado: ${id}` : "anónimo";
+  $("#who").classList.toggle("ok", Boolean(id));
   $("#device-id").textContent = deviceId || "—";
   // Search Users acepta ?query=; a un anónimo se lo encuentra por device ID.
-  const link = $("#user-link");
-  link.href = `${dashUrl("users/user_search")}?query=${encodeURIComponent(userId || deviceId)}`;
-  link.textContent = userId ? "Ver este usuario en Braze ↗" : "Ver este usuario anónimo en Braze (por device ID) ↗";
+  $("#link-profile").href = `${dashUrl("users/user_search")}?query=${encodeURIComponent(id || deviceId)}`;
+  $("#cart-hint").textContent = id ? "Agrega un producto al carrito y espera 2 minutos." : "Primero identifícate con tu email en el paso 2.";
 }
 
 function renderBanners(snapshot) {
   for (const [slot, placementId] of Object.entries(cfg.bannerPlacements)) {
-    const container = document.querySelector(`.banner-slot[data-placement="${slot}"]`);
     const banner = snapshot.banners[placementId];
-    if (!banner || banner.isControl) {
-      container.classList.remove("filled");
-      container.innerHTML = `<p class="fallback">Placement <code>${placementId}</code>: sin banner para este usuario${banner?.isControl ? " (grupo de control)" : ""}.</p>`;
-      continue;
-    }
+    const container = document.querySelector(`.banner-slot[data-placement="${slot}"]`);
+    if (!banner || banner.isControl) continue; // queda el aviso punteado
+    container.innerHTML = "";
     braze.insertBanner(banner, container);
     container.classList.add("filled");
   }
 }
 
-function setupBanners() {
+function refreshBanners() {
   const ids = Object.values(cfg.bannerPlacements);
-  braze.subscribeToBannersEvents((event) => {
-    const T = braze.ChannelEventType;
-    if (event.type === T.ERROR) {
-      log("banners: ERROR", { reason: event.reason, retryState: event.retryState }, "err");
-      return;
-    }
-    log(`banners: ${event.type}`, { placements: Object.keys(event.cacheSnapshot.banners) });
-    renderBanners(event.cacheSnapshot);
-  });
   braze.requestBannersRefresh(ids);
   log("requestBannersRefresh", ids);
 }
 
-function setupUi() {
-  $("#form-user").addEventListener("submit", (e) => {
-    e.preventDefault();
-    const f = Object.fromEntries(new FormData(e.target));
-    braze.changeUser(f.external_id);
-    const user = braze.getUser();
-    if (f.email) user.setEmail(f.email);
-    if (f.first_name) user.setFirstName(f.first_name);
-    user.setCustomUserAttribute("plan", f.plan);
-    flush();
-    log("changeUser + atributos", f);
-    refreshUserInfo();
+function setupBanners() {
+  braze.subscribeToBannersEvents((event) => {
+    if (event.type === braze.ChannelEventType.ERROR) {
+      log("banners: ERROR", { reason: event.reason, retryState: event.retryState }, "err");
+      return;
+    }
+    log("banners", { placements: Object.keys(event.cacheSnapshot.banners) });
+    renderBanners(event.cacheSnapshot);
   });
+  // No hace falta pedirlos acá: openSession() ya los pide (y un pedido antes de la sesión vuelve con error).
+}
 
-  $("#btn-logout").addEventListener("click", () => {
-    braze.wipeData();
-    log("wipeData", "Se recarga la página con un device nuevo");
-    setTimeout(() => location.reload(), 800);
-  });
-
-  $("#form-event").addEventListener("submit", (e) => {
-    e.preventDefault();
-    const name = new FormData(e.target).get("name");
-    const props = { seccion: "eventos", origen: "demo-braze" };
-    braze.logCustomEvent(name, props);
-    flush();
-    log(`logCustomEvent("${name}")`, props);
-  });
-
+function renderProducts(highlight) {
   $("#products").innerHTML = PRODUCTS.map((p) => `
-    <div class="product">
+    <div class="product${p.id === highlight ? " highlight" : ""}" id="prod-${p.id}">
+      ${p.id === highlight ? '<span class="tag">Para ti</span>' : ""}
       <div class="thumb">${p.name.split(" ")[0]}</div>
       <strong>${p.name}</strong>
       <span class="muted">USD ${p.price}</span>
@@ -112,6 +103,42 @@ function setupUi() {
         <button class="small" data-buy="${p.id}">Comprar</button>
       </div>
     </div>`).join("");
+}
+
+function setupUi() {
+  $("#btn-log-open").addEventListener("click", () => setLogOpen(true));
+  $("#btn-log-close").addEventListener("click", () => setLogOpen(false));
+  $("#toggle-notes").addEventListener("change", (e) => document.body.classList.toggle("show-notes", e.target.checked));
+
+  $("#form-user").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const f = Object.fromEntries(new FormData(e.target));
+    // ID estable por persona: el mismo email da el mismo perfil en cada demo.
+    const id = "demo-" + f.email.trim().toLowerCase().replace(/[^a-z0-9]+/g, "-");
+    braze.changeUser(id);
+    const user = braze.getUser();
+    user.setEmail(f.email.trim());
+    if (f.first_name) user.setFirstName(f.first_name.trim());
+    user.setCustomUserAttribute("plan", f.plan);
+    flush();
+    log(`changeUser("${id}") + atributos`, { email: f.email, first_name: f.first_name, plan: f.plan });
+    refreshUserInfo();
+    // El changeUser ya pidió los banners, pero Braze tarda unos 20 s en guardar el plan:
+    // se vuelven a pedir dos veces (cada sesión tiene 5 pedidos).
+    $("#identify-hint").textContent = "Braze está armando tu banner: tarda unos 20 segundos…";
+    setTimeout(refreshBanners, 15000);
+    setTimeout(() => { refreshBanners(); $("#identify-hint").textContent = `Listo: el banner de arriba es el de plan ${f.plan}.`; }, 30000);
+  });
+
+  // Vuelve a ser un visitante anónimo nuevo: wipeData() borra el usuario y genera un device nuevo.
+  $("#btn-reset").addEventListener("click", () => {
+    braze.wipeData();
+    $("#log").innerHTML = "";
+    log("wipeData", "Visitante anónimo nuevo");
+    saveLog();
+    history.replaceState(null, "", location.pathname);
+    setTimeout(() => location.reload(), 500);
+  });
 
   $("#products").addEventListener("click", (e) => {
     const cartId = e.target.dataset.cart;
@@ -120,57 +147,46 @@ function setupUi() {
     if (!p) return;
     if (cartId) {
       // El plan viaja en el evento: el Canvas se divide por esta propiedad y no por el atributo,
-      // que puede no estar procesado todavía si el usuario se acaba de identificar.
+      // que puede no estar procesado todavía si la persona se acaba de identificar.
       const props = { producto: p.id, nombre: p.name, precio: p.price, plan: $("select[name=plan]").value };
       braze.logCustomEvent("agrego_al_carrito", props);
       log('logCustomEvent("agrego_al_carrito")', props);
+      e.target.textContent = "En el carrito ✓";
     } else {
-      braze.logPurchase(p.id, p.price, "USD", 1, { origen: "demo-braze" });
+      braze.logPurchase(p.id, p.price, "USD", 1);
       // Además de la compra, un custom event: en el sandbox el Canvas no ofrece "Makes Purchase"
-      // como conversión ni como salida, pero sí "Performs custom event".
-      braze.logCustomEvent("compro", { producto: p.id, precio: p.price });
-      log(`logPurchase("${p.id}", ${p.price}, "USD", 1)`);
+      // como conversión ni como salida, pero sí "Performs custom event". También dispara la card post-compra.
+      const props = { producto: p.id, nombre: p.name, precio: p.price };
+      braze.logCustomEvent("compro", props);
+      log(`logPurchase("${p.id}", ${p.price}, "USD", 1) + logCustomEvent("compro")`, props);
+      e.target.textContent = "Comprado ✓";
+      // La card post-compra tarda unos 20 s en estar disponible.
+      for (const ms of [15000, 30000]) setTimeout(() => braze.requestContentCardsRefresh(), ms);
     }
     flush();
   });
 
   $("#btn-inapp").addEventListener("click", () => {
-    braze.logCustomEvent("demo_inapp");
+    braze.logCustomEvent("demo_boton_clickeado");
     flush();
-    log('logCustomEvent("demo_inapp")', "Si hay una campaña con ese trigger, el in-app aparece ahora");
+    log('logCustomEvent("demo_boton_clickeado")', "La campaña responde con un modal según tu plan");
   });
-
-  $("#btn-banners").addEventListener("click", () => {
-    const ids = Object.values(cfg.bannerPlacements);
-    braze.requestBannersRefresh(ids);
-    log("requestBannersRefresh", ids);
-  });
-
-  $("#btn-cards").addEventListener("click", () => {
-    braze.requestContentCardsRefresh();
-    log("requestContentCardsRefresh");
-  });
-
-  $("#btn-clear").addEventListener("click", () => { $("#log").innerHTML = ""; });
 }
 
 // Llegada desde el email del Canvas: ?uid=<external ID>&producto=<id>.
-// Identifica al usuario (el link lo arma Braze con {{${user_id}}}) y destaca el producto del carrito.
 function handleEmailArrival() {
   const q = new URLSearchParams(location.search);
   const uid = q.get("uid");
   const producto = q.get("producto");
-  if (uid) {
-    braze.changeUser(uid);
-    flush();
-    log("llegada desde el email: changeUser", { uid, producto });
-    refreshUserInfo();
-  }
-  const card = producto && document.querySelector(`[data-buy="${producto}"]`)?.closest(".product");
-  if (card) {
-    card.classList.add("highlight");
-    card.scrollIntoView({ behavior: "smooth", block: "center" });
-  }
+  renderProducts(uid ? producto : null);
+  if (!uid) return;
+  braze.changeUser(uid);
+  flush();
+  log(`changeUser("${uid}")`, { origen: "link del email", producto });
+  $("#from-email-id").textContent = uid;
+  $("#from-email").hidden = false;
+  history.replaceState(null, "", location.pathname);
+  setTimeout(() => document.getElementById(`prod-${producto}`)?.scrollIntoView({ behavior: "smooth", block: "center" }), 400);
 }
 
 function init() {
@@ -178,19 +194,15 @@ function init() {
   document.querySelectorAll("[data-placement-id]").forEach((el) => {
     el.textContent = cfg.bannerPlacements[el.dataset.placementId];
   });
+  restoreLog();
+  setupUi();
 
   // EasyPrivacy (Brave Shields, uBlock, etc.) bloquea el CDN del SDK y el envío de datos.
   if (typeof window.braze === "undefined") {
-    $("#status").textContent = "SDK bloqueado: desactivá el bloqueador para esta página";
+    renderProducts(null);
+    $("#status").textContent = "Bloqueado: desactiva el bloqueador para esta página";
     $("#status").classList.add("err");
-    log("SDK no cargó", "Un bloqueador de anuncios (Brave Shields, uBlock…) bloquea js.appboycdn.com y braze.eu/api/v3/data/. Desactivalo para este sitio y recargá.", "err");
-    return;
-  }
-
-  if (!cfg.apiKey || !cfg.baseUrl) {
-    $("#status").textContent = "Falta apiKey / baseUrl en js/config.js";
-    $("#status").classList.add("err");
-    log("config", "Completá apiKey y baseUrl en js/config.js", "err");
+    log("SDK no cargó", "Un bloqueador de anuncios (Brave Shields, uBlock…) bloquea js.appboycdn.com y braze.eu/api/v3/data/. Desactívalo para este sitio y recarga.", "err");
     return;
   }
 
@@ -206,12 +218,11 @@ function init() {
   setupBanners();
   braze.openSession();
 
-  setupUi();
-  $("#status").textContent = "SDK inicializado";
+  $("#status").textContent = "Conectado a Braze";
   $("#status").classList.add("ok");
   log("initialize", { baseUrl: cfg.baseUrl });
-  refreshUserInfo();
   handleEmailArrival();
+  refreshUserInfo();
 }
 
 init();
